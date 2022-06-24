@@ -1,6 +1,10 @@
 # patreon-ex
 
-This is an incomplete and non-functional wrapper for the Patreon V2 API.
+**This is an incomplete and non-functional wrapper for the Patreon V2 API.**
+
+OAuth2 is working, nothing else is. 
+
+To setup convert "config/config.txt" into a config.exs file and insert your Patreon API keys into it. 
 
 **TODO: Add description**
 
