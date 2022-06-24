@@ -1,4 +1,6 @@
-# Patreon
+# patreon-ex
+
+This is an incomplete and non-functional wrapper for the Patreon V2 API.
 
 **TODO: Add description**
 
