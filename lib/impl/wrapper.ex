@@ -107,9 +107,9 @@ defmodule Patreon.Impl.Wrapper do
     resp = http(
       base_url(),
       "GET",
-      "/api/oauth2/v2/identity",# <> "?fields%5Buser%5D=about,url,vanity",
+      "/api/oauth2/v2/identity" <> "?fields%5Buser%5D=about,full_name",
       %{},
-      ["Authorization: Bearer #{token}"]
+      [{"Authorization", "Bearer #{token}"}]
     )
 
     case resp do
