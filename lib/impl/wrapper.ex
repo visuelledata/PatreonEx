@@ -1,5 +1,15 @@
 defmodule Patreon.Impl.Wrapper do
 
+  @scopes MapSet.new([
+    "campaigns",
+    "campaigns.members",
+    "campaigns.members[email]",
+    "campaigns.members.address",
+    "identity",
+    "identity.memberships",
+    "identity[email]"
+  ])
+
   defp base_url(),     do: "www.patreon.com"
   defp redirect_uri(), do: Patreon.Config.redirect_uri()
   defp client_id,      do: Patreon.Config.client_id()
@@ -50,15 +60,57 @@ defmodule Patreon.Impl.Wrapper do
     end
   end
 
-  def authorize_query() do
+
+  def authorize_query(scope, true) do
     state = random_string()
 
     %{
       response_type: "code",
       redirect_uri: redirect_uri(),
-      # scope: "identity",
+      scope: Enum.join(scope, " "),
       state: state,
+      client_id: client_id()
     }
+  end
+
+  def authorize_query(_scope, false) do
+    state = random_string()
+
+    %{
+      response_type: "code",
+      redirect_uri: redirect_uri(),
+      state: state,
+      client_id: client_id()
+    }
+  end
+
+  def authorize_url() do
+    base_url()
+    <> "/oauth2/authorize?"
+    <> URI.encode_query(authorize_query(@scopes, true))
+  end
+
+  def authorize_url(scope) when is_list(scope) do
+    scope = MapSet.new(scope)
+
+    cond do
+      MapSet.subset?(scope, @scopes) ->
+        {:ok, base_url() <> "/oauth2/authorize?" <> URI.encode_query(authorize_query(scope, scope !== MapSet.new()))}
+      true ->
+        {:error, "Invalid scope. Valid scopes are: #{Enum.join(@scopes, ", ")}"}
+    end
+  end
+
+  defp random_string() do
+    binary = <<
+      System.system_time(:nanosecond)::64,
+      :erlang.phash2({node(), self()})::16,
+      :erlang.unique_integer()::16
+    >>
+
+    binary
+    |> Base.url_encode64()
+    |> String.replace(["/", "+"], "-")
   end
 
   def validate_query(validation_code) do
@@ -69,23 +121,6 @@ defmodule Patreon.Impl.Wrapper do
       client_secret: secret(),
       redirect_uri:  redirect_uri(),
     }
-  end
-
-  def authorize_url() do
-    base_url() <> "/oauth2/authorize?" <> URI.encode_query(Map.put(authorize_query(), :client_id, client_id()))
-  end
-
-
-  defp random_string do
-    binary = <<
-      System.system_time(:nanosecond)::64,
-      :erlang.phash2({node(), self()})::16,
-      :erlang.unique_integer()::16
-    >>
-
-    binary
-    |> Base.url_encode64()
-    |> String.replace(["/", "+"], "-")
   end
 
   def validate_token(validation_code) do
@@ -107,8 +142,23 @@ defmodule Patreon.Impl.Wrapper do
     resp = http(
       base_url(),
       "GET",
-      "/api/oauth2/v2/identity" <> "?fields%5Buser%5D=about,full_name",
-      %{},
+      "/api/oauth2/v2/identity",# <> "?fields%5Buser%5D=about,full_name",
+      %{"fields[user]" => Enum.join(["about", "full_name"], ",")},
+      [{"Authorization", "Bearer #{token}"}]
+    )
+
+    case resp do
+      {:ok, info} -> {:ok, Jason.decode!(info)}
+      {:error, _reason} = err -> err
+    end
+  end
+
+  def get_campaigns(token) do
+    resp = http(
+      base_url(),
+      "GET",
+      "/api/oauth2/v2/campaigns",# <> "?fields%5Btier%5D=currently_entitled_tiers",
+      %{"fields[campaigns]" => "creation_name,discord_server_id"},#
       [{"Authorization", "Bearer #{token}"}]
     )
 
