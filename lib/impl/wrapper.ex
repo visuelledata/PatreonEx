@@ -10,6 +10,8 @@ defmodule Patreon.Impl.Wrapper do
     "identity[email]"
   ])
 
+
+
   defp base_url(),     do: "www.patreon.com"
   defp redirect_uri(), do: Patreon.Config.redirect_uri()
   defp client_id,      do: Patreon.Config.client_id()
@@ -138,12 +140,12 @@ defmodule Patreon.Impl.Wrapper do
     end
   end
 
-  def get_user(token) do
+  def get_user(token, params) do
     resp = http(
       base_url(),
       "GET",
-      "/api/oauth2/v2/identity",# <> "?fields%5Buser%5D=about,full_name",
-      %{"fields[user]" => Enum.join(["about", "full_name"], ",")},
+      "/api/oauth2/v2/identity",
+      params, # %{"fields[user]" => Enum.join(fields, ",")},
       [{"Authorization", "Bearer #{token}"}]
     )
 
@@ -153,12 +155,12 @@ defmodule Patreon.Impl.Wrapper do
     end
   end
 
-  def get_campaigns(token) do
+  def get_campaigns(token, params) do
     resp = http(
       base_url(),
       "GET",
-      "/api/oauth2/v2/campaigns",# <> "?fields%5Btier%5D=currently_entitled_tiers",
-      %{"fields[campaigns]" => "creation_name,discord_server_id"},#
+      "/api/oauth2/v2/campaigns",
+      params, # %{"fields[campaign]" => Enum.join(fields, ",")},#
       [{"Authorization", "Bearer #{token}"}]
     )
 
