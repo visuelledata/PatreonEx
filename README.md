@@ -1,12 +1,16 @@
 # patreon-ex
 
-**This is an incomplete and non-functional wrapper for the Patreon V2 API.**
+This is an incomplete for the Patreon V2 API. Not all endpoints have wrapper functions yet.
 
-OAuth2 is working, nothing else is. 
+For setup: 
+* You must first [register a client](https://docs.patreon.com/#clients-and-api-keys) on Patreon, when doing this select Client API V2
 
-To setup convert "config/config.txt" into a config.exs file and insert your Patreon API keys into it. 
-
-**TODO: Add description**
+The  workflow is:
+1. Fill out the config/config.txt file and change it to an .exs filetype  
+2. Run Patreon.Impl.authothorize_url/1 with the desired scopes
+3. Go to the generated link and login or click "Allow"
+4. Pass the "code" parameter from the redirected URL into Patreon.validate_token/1 and copy the access_token from the response
+5. Pass the access_token into Patreon.get_user/1 or Patreon.get_campaigns/1
 
 ## Installation
 
