@@ -17,7 +17,7 @@ defmodule Patreon.Impl.Wrapper do
   defp client_id,      do: Patreon.Config.client_id()
   defp secret,         do: Patreon.Config.secret()
 
-  def http(host, method, path, query, headers, body \\ "") do
+  defp http(host, method, path, query, headers, body \\ "") do
     {:ok, conn} = Mint.HTTP.connect(:https, host, 443)
 
     query_string =
@@ -63,7 +63,7 @@ defmodule Patreon.Impl.Wrapper do
   end
 
 
-  def authorize_query(scope, true) do
+  defp authorize_query(scope, true) do
     state = random_string()
 
     %{
@@ -75,7 +75,7 @@ defmodule Patreon.Impl.Wrapper do
     }
   end
 
-  def authorize_query(_scope, false) do
+  defp authorize_query(_scope, false) do
     state = random_string()
 
     %{
@@ -115,7 +115,7 @@ defmodule Patreon.Impl.Wrapper do
     |> String.replace(["/", "+"], "-")
   end
 
-  def validate_query(validation_code) do
+  defp validate_query(validation_code) do
     %{
       code: validation_code,
       grant_type: "authorization_code",
