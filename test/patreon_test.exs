@@ -1,8 +1,8 @@
-defmodule PatreonTest do
-  use ExUnit.Case
-  doctest Patreon
+defmodule PatreonExTest do
+  use ExUnit.Case, async: true
+  doctest PatreonEx
 
   test "greets the world" do
-    assert Patreon.hello() == :world
+    assert PatreonEx.hello() == :world
   end
 end

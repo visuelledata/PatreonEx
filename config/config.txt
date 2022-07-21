@@ -1,8 +1,0 @@
-import Config
-
-config :patreon,
-  client_id: "your client_id",
-  client_secret: "your client_secret",
-  creator_access_token: "your creator_access_token",
-  creator_refresh_token: "your creator_refresh_token",
-  redirect_uri: "your redirect_uri"

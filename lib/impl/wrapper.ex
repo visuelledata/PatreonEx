@@ -1,4 +1,4 @@
-defmodule Patreon.Impl.Wrapper do
+defmodule PatreonEx.Impl.Wrapper do
 
   @scopes MapSet.new([
     "campaigns",
@@ -13,9 +13,9 @@ defmodule Patreon.Impl.Wrapper do
 
 
   defp base_url(),     do: "www.patreon.com"
-  defp redirect_uri(), do: Patreon.Config.redirect_uri()
-  defp client_id,      do: Patreon.Config.client_id()
-  defp secret,         do: Patreon.Config.secret()
+  # defp redirect_uri(), do: Patreon.Config.redirect_uri()
+  # defp client_id,      do: Patreon.Config.client_id()
+  # defp secret,         do: Patreon.Config.secret()
 
   defp http(host, method, path, query, headers, body \\ "") do
     {:ok, conn} = Mint.HTTP.connect(:https, host, 443)
@@ -63,44 +63,49 @@ defmodule Patreon.Impl.Wrapper do
   end
 
 
-  defp authorize_query(scope, true) do
+  defp authorize_query(scope, true, redirect_uri, client_id) do
     state = random_string()
 
     %{
       response_type: "code",
-      redirect_uri: redirect_uri(),
+      redirect_uri: redirect_uri,
       scope: Enum.join(scope, " "),
       state: state,
-      client_id: client_id()
+      client_id: client_id
     }
   end
 
-  defp authorize_query(_scope, false) do
+  defp authorize_query(_scope, false, redirect_uri, client_id) do
     state = random_string()
 
     %{
       response_type: "code",
-      redirect_uri: redirect_uri(),
+      redirect_uri: redirect_uri,
       state: state,
-      client_id: client_id()
+      client_id: client_id
     }
   end
 
-  def authorize_url() do
-    base_url()
-    <> "/oauth2/authorize?"
-    <> URI.encode_query(authorize_query(@scopes, true))
-  end
-
-  def authorize_url(scope) when is_list(scope) do
+  def authorize_url(scope, redirect_uri, client_id) when is_list(scope) do
     scope = MapSet.new(scope)
 
     cond do
       MapSet.subset?(scope, @scopes) ->
-        {:ok, base_url() <> "/oauth2/authorize?" <> URI.encode_query(authorize_query(scope, scope !== MapSet.new()))}
+        {
+          :ok,
+          base_url()
+            <> "/oauth2/authorize?"
+            <> URI.encode_query(authorize_query(scope, scope !== MapSet.new(), redirect_uri, client_id))
+        }
       true ->
         {:error, "Invalid scope. Valid scopes are: #{Enum.join(@scopes, ", ")}"}
     end
+  end
+
+  def authorize_url(redirect_uri, client_id) do
+    base_url()
+    <> "/oauth2/authorize?"
+    <> URI.encode_query(authorize_query(@scopes, true, redirect_uri, client_id))
   end
 
   defp random_string() do
@@ -115,22 +120,22 @@ defmodule Patreon.Impl.Wrapper do
     |> String.replace(["/", "+"], "-")
   end
 
-  defp validate_query(validation_code) do
+  defp validate_query(validation_code, redirect_uri, client_id, client_secret) do
     %{
       code: validation_code,
       grant_type: "authorization_code",
-      client_id: client_id(),
-      client_secret: secret(),
-      redirect_uri:  redirect_uri(),
+      client_id: client_id,
+      client_secret: client_secret,
+      redirect_uri:  redirect_uri,
     }
   end
 
-  def validate_token(validation_code) do
+  def validate_token(validation_code, redirect_uri, client_id, client_secret) do
     resp = http(
       base_url(),
       "POST",
       "/api/oauth2/token",
-      validate_query(validation_code),
+      validate_query(validation_code, redirect_uri, client_id, client_secret),
       ["Content-Type: application/x-www-form-urlencoded"]
     )
 
