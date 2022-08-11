@@ -130,7 +130,7 @@ defmodule PatreonEx.Impl.Wrapper do
     }
   end
 
-  def validate_token(validation_code, redirect_uri, client_id, client_secret) do
+  def validate_code(validation_code, redirect_uri, client_id, client_secret) do
     resp = http(
       base_url(),
       "POST",
