@@ -13,12 +13,13 @@ defmodule PatreonEx do
 
   Returns `string`
 
-  ## Example:
+  ## Examples
     authorize_url([identity, campaigns], "https://google.com", "your_client_id")
 
   """
 
   @spec authorize_url(list(binary), binary, binary) :: binary
+
   defdelegate authorize_url(scope, redirect_uri, client_id), to: Wrapper
 
   @doc """
@@ -27,12 +28,13 @@ defmodule PatreonEx do
 
   Returns `string`
 
-  ## Example:
+  ## Examples
     authorize_url("https://google.com", "your_client_id")
 
   """
 
   @spec authorize_url(list(binary), binary, binary) :: binary
+
   defdelegate authorize_url(redirect_uri, client_id), to: Wrapper
 
 
@@ -46,11 +48,12 @@ defmodule PatreonEx do
 
   Returns `map`
 
-  ## Example:
+  ## Examples
     validate_code("your code param from url", "https://google.com", "your client id", "your client secret")
 
   """
   @spec validate_code(binary, binary, binary, binary) :: map
+
   defdelegate validate_code(validation_code, redirect_uri, client_id, client_secret), to: Wrapper
 
   @doc """
@@ -58,7 +61,7 @@ defmodule PatreonEx do
 
   Returns `map`
 
-  ## Example:
+  ## Examples
     get_user(
       "access_token_here",
       %{
@@ -70,6 +73,7 @@ defmodule PatreonEx do
   """
 
   @spec get_user(binary, map) :: map
+
   defdelegate get_user(token, params), to: Wrapper
 
   @doc """
@@ -77,8 +81,8 @@ defmodule PatreonEx do
 
   Returns `map`
 
-  ## Example:
-  def get_campaigns(token) do
+  ## Examples
+
     get_campaigns(
       "access_token_here",
       %{
@@ -87,10 +91,10 @@ defmodule PatreonEx do
         "fields[tier]" => Enum.join(["title", "description"], ",")
       }
       )
-  end
   """
 
   @spec get_campaigns(binary, map) :: map
+
   defdelegate get_campaigns(token, params), to: Wrapper
 
 end
