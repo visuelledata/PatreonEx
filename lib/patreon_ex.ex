@@ -14,7 +14,7 @@ defmodule PatreonEx do
   Returns `string`
 
   ## Examples
-    authorize_url([identity, campaigns], "https://google.com", "your_client_id")
+      authorize_url([identity, campaigns], "https://google.com", "your_client_id")
 
   """
 
@@ -29,7 +29,7 @@ defmodule PatreonEx do
   Returns `string`
 
   ## Examples
-    authorize_url("https://google.com", "your_client_id")
+      authorize_url("https://google.com", "your_client_id")
 
   """
 
@@ -49,7 +49,7 @@ defmodule PatreonEx do
   Returns `map`
 
   ## Examples
-    validate_code("your code param from url", "https://google.com", "your client id", "your client secret")
+      validate_code("your code param from url", "https://google.com", "your client id", "your client secret")
 
   """
   @spec validate_code(binary, binary, binary, binary) :: map
@@ -62,14 +62,14 @@ defmodule PatreonEx do
   Returns `map`
 
   ## Examples
-    get_user(
-      "access_token_here",
-      %{
-        "include" => "memberships.currently_entitled_tiers",
-        "fields[user]" => Enum.join(["about", "hide_pledges", "full_name", "image_url", "thumb_url", "url"], ","),
-        "fields[tier]" => Enum.join(["title", "description"], ",")
-      }
-      )
+      get_user(
+        "access_token_here",
+        %{
+          "include" => "memberships.currently_entitled_tiers",
+          "fields[user]" => Enum.join(["about", "hide_pledges", "full_name", "image_url", "thumb_url", "url"], ","),
+          "fields[tier]" => Enum.join(["title", "description"], ",")
+        }
+        )
   """
 
   @spec get_user(binary, map) :: map
@@ -82,15 +82,14 @@ defmodule PatreonEx do
   Returns `map`
 
   ## Examples
-
-    get_campaigns(
-      "access_token_here",
-      %{
-        "include" => "tiers",
-        "fields[campaign]" => Enum.join(["vanity", "creation_name", "discord_server_id", "image_url", "is_nsfw", "url"], ","),
-        "fields[tier]" => Enum.join(["title", "description"], ",")
-      }
-      )
+      get_campaigns(
+        "access_token_here",
+        %{
+          "include" => "tiers",
+          "fields[campaign]" => Enum.join(["vanity", "creation_name", "discord_server_id", "image_url", "is_nsfw", "url"], ","),
+          "fields[tier]" => Enum.join(["title", "description"], ",")
+        }
+        )
   """
 
   @spec get_campaigns(binary, map) :: map
